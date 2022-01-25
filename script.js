@@ -3,34 +3,17 @@ let playerScore = 0;
 let computerScore = 0;
 let draw = 0;
 
-//play the game
-game()
+const buttons = document.querySelectorAll('button');
+const container =document.querySelector('#container')
+const alertUser = document.querySelector('#alert');
+const playScore = document.querySelector('#player-score');
+const compScore = document.querySelector('#computer-score');
+const draws = document.querySelector('#draws');
+const finalResult = document.querySelector('#final-result')
+const reload = document.querySelector('.reload')
 
-//Define the game function
-function game() {
-    for (let i = 1; i <= 5; i++) {
-        //Prompt the user to make a choice, convert the string to lowercase
-        const playerSelection = prompt("Make a choice: 'Rock', 'Paper', or 'Scissors'?").toLowerCase();
-        //Ask the computer to make a selection using the function computerPlay() defined below
-        //Which randomly selectes rock, paper or scissors
-        const computerSelection = computerPlay();
-    
-        //Then play each round using the playRound() function defined below which compares
-        //the player's choice and computer's and determine the winner. The winner's score defined above this function gets incremented by 1 till the end of the game
-        console.log(playRound(playerSelection, computerSelection))
-        
-    }
-
-    //Output the final winner of the game after 5 rounds
-    if (playerScore > computerScore) {
-        console.log(`You won the game! You scored: ${playerScore} out of 5 rounds and computer scored: ${computerScore}, with ${draw} draw(s)`)
-    } else if (playerScore < computerScore) {
-        console.log(`You lost the game! You scored: ${playerScore} out of 5 rounds and computer scored: ${computerScore}, with ${draw} draw(s)`)
-    } else {
-        console.log(`It's a draw! Your and the computer scored ${playerScore} apiece, with ${draw} draw(s)`)
-    }
-
-}
+buttons.forEach((button) => button.addEventListener('click', playRound));
+reload.addEventListener('click', () => window.location.reload())
 
 //define computerPlay()
 function computerPlay() {
@@ -39,39 +22,69 @@ function computerPlay() {
     return possibleSelections[randomSelection];
 }
 
-//define playRound()
-function playRound(playerSelection, computerSelection) {
+function determineRoundWinner(playerSelection, computerSelection) {
     if (playerSelection === computerSelection) {
-        draw++
-        return `This round is a draw! You and computer chose ${playerSelection}`;
+        draw++;
+        alertUser.textContent = `This round is a draw! You and computer chose ${playerSelection}`;
+        return;
     }
 
     switch (playerSelection) {
         case 'rock':
             if (computerSelection === 'scissors') {
-                playerScore++
-                return `You won this round! Computer chose ${computerSelection}`;
+                playerScore++;
+                alertUser.textContent = `You won this round! Computer chose ${computerSelection}`
+                return;
             } else {
                 computerScore++
-                return `You lost this round! Computer chose ${computerSelection}`;
+                alertUser.textContent = `You lost this round! Computer chose ${computerSelection}`; 
+                return;
             }
         case 'paper':
             if (computerSelection === 'rock') {
                 playerScore++
-                return `You won this round! Computer chose ${computerSelection}`;
+                alertUser.textContent = `You won this round! Computer chose ${computerSelection}`
+                return;
             } else {
                 computerScore++
-                return `You lost this round! Computer chose ${computerSelection}`;
+                alertUser.textContent = `You lost this round! Computer chose ${computerSelection}`; 
+                return;
             }
         case 'scissors':
             if (computerSelection === 'paper') {
                 playerScore++
-                return `You won this round! Computer chose ${computerSelection}`;
+                alertUser.textContent = `You won this round! Computer chose ${computerSelection}`
+                return;
             } else {
                 computerScore++
-                return `You lost this round! Computer chose ${computerSelection}`;
+                alertUser.textContent = `You lost this round! Computer chose ${computerSelection}`; 
+                return;
             }
-        default:
-            return "Invalid choice: choose one option from 'rock', 'paper', and 'scissors'"
     }
+}
+
+function determineGameWinner() {
+    if (playerScore === 5 ) {
+        buttons.forEach((button) => button.removeEventListener('click', playRound));
+        finalResult.textContent = "Yay! You were first to 5. You won!";
+        reload.classList.toggle('reload');
+    } else if (computerScore === 5) {
+        buttons.forEach((button) => button.removeEventListener('click', playRound));
+        finalResult.textContent = "Uh o! You lost. Computer beat you to 5!";
+        reload.classList.toggle('reload');
+    }
+}
+
+//define playRound()
+function playRound() {
+    const playerSelection = this.id;
+    const computerSelection = computerPlay();
+
+    determineRoundWinner(playerSelection, computerSelection);
+
+    playScore.textContent = playerScore;
+    compScore.textContent = computerScore;
+    draws.textContent = draw 
+    
+    determineGameWinner()
 }
